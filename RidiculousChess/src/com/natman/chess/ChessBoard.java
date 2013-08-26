@@ -194,7 +194,7 @@ public final class ChessBoard implements InputProcessor {
 		return freshCastles;
 	}
 	
-	public void render(SpriteBatch spriteBatch) {
+	public void render(SpriteBatch spriteBatch) {		
 		boardSprite.draw(spriteBatch);
 		
 		for (int y = 0; y < BOARD_HEIGHT; y++) {
@@ -302,7 +302,7 @@ public final class ChessBoard implements InputProcessor {
 	}
 	
 	private void toggleTeam() {
-		//de-passant tag
+		
 		for (int y = 0; y < BOARD_HEIGHT; y++) {
 			for (int x = 0; x < BOARD_WIDTH; x++) {
 				ChessPiece piece = board[x][y];
@@ -313,7 +313,7 @@ public final class ChessBoard implements InputProcessor {
 					if (piece instanceof Pawn) {
 						Pawn pwn = (Pawn) piece;
 						if (pwn.PASSANTMEBRO) {
-							pwn.PASSANTMEBRO = false;
+							pwn.PASSANTMEBRO = false; //de passant tag
 						}
 					}
 				}
@@ -324,8 +324,42 @@ public final class ChessBoard implements InputProcessor {
 		selectedPiece = null;
 		
 		timer.reset();
+	
 	}
 
+	public void checkForCheck() {
+
+		for (int y = 0; y < BOARD_HEIGHT; y++) {
+			for (int x = 0; x < BOARD_WIDTH; x++) {
+				ChessPiece piece = board[x][y];
+				
+				if (piece == null) continue;
+				
+				if (piece instanceof King) {
+					((King) piece).IS_IN_CHECK = false;
+				}
+			}
+		}
+		
+		for (int y = 0; y < BOARD_HEIGHT; y++) {
+			for (int x = 0; x < BOARD_WIDTH; x++) {
+				ChessPiece piece = board[x][y];
+				
+				if (piece == null || piece instanceof King) continue;
+				
+				for (Point point : piece.getMovePoints(this)) {
+					ChessPiece p2 = getPiece(point.x, point.y);
+					
+					if (p2 instanceof King && p2.getTeam() != piece.getTeam()) {
+						((King) p2).IS_IN_CHECK = true; //check for check
+					}
+				}
+				
+			}
+		}
+		
+	}
+	
 	@Override
 	public boolean keyDown(int keycode) {
 		// TODO Auto-generated method stub
@@ -381,7 +415,7 @@ public final class ChessBoard implements InputProcessor {
 						}
 					}
 					
-					movePiece(selectedPiece.position, p);
+					movePiece(selectedPiece.position, p);					
 					selectedPiece = null;
 					toggleTeam();
 				}

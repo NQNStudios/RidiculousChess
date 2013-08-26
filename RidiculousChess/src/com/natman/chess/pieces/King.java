@@ -14,6 +14,8 @@ public class King extends ChessPiece {
 	private boolean positionSet = false;
 	private boolean moved = false;
 	
+	public boolean IS_IN_CHECK = false;
+	
 	public King(boolean team) {
 		super(team);
 	}
@@ -38,9 +40,11 @@ public class King extends ChessPiece {
 	
 	@Override
 	protected Array<Point> getMovePoints(ChessBoard board) {
+		board.checkForCheck();
+		
 		Array<Point> movePoints = new Array<Point>();
 		
-		if (!moved && board.getFreshCastles(team).size > 0) {
+		if (!moved && !IS_IN_CHECK && board.getFreshCastles(team).size > 0) {
 			for (Castle castle : board.getFreshCastles(team)) {
 				boolean canCastleTo = true;
 				Point loc = new Point(castle.getPosition());
